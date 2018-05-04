@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Snapsauce</string>
+    <string name="fillAll">Please fill all the fields</string>
+    <string-array name="mode">
+        <item>Customer</item>
+        <item>Admin</item>
+    </string-array>
+    <string-array name="categories">
+        <item>Drink</item>
+        <item>Appetizer</item>
+        <item>Main course</item>
+        <item>Dessert</item>
+    </string-array>
+</resources>
