@@ -15,4 +15,12 @@ public class DBSchema{
     public static final String PRICE = "price";
     public static final String TIME = "time";
     public static final String CALORIES = "calories";
+
+    public static final String TABLE3_NAME = "cart";
+    public static final String ORDERED_BY = "ordered_by";
+    public static final String ITEM_NAME = "name";
+    public static final String QUANTITY = "quantity";
+    public static final String UNIT_PRICE = "unit_price";
+    public static final String PREP_TIME = "time";
+
 }

@@ -1,9 +1,14 @@
 package com.example.varun.snapsauce;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -28,14 +33,33 @@ public class AdminActivity extends AppCompatActivity {
     private String valPrice;
     private String valTime;
     private String valCalories;
+    private DrawerLayout drawer;
 
     private DBHelper dbHelper;
     private SQLiteDatabase database;
+    private String user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin);
+
+        Bundle bundle = getIntent().getExtras();
+        user = bundle.getString("user");
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_admin);
+        NavigationView nav = (NavigationView) findViewById(R.id.nav_view2);
+        nav.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                if(item.getItemId() == R.id.remove){
+                    Intent intent = new Intent(AdminActivity.this, MenuActivity.class);
+                    intent.putExtra("user", user);
+                    startActivity(intent);
+                }
+                return true;
+            }
+        });
 
         category = (Spinner) findViewById(R.id.spinner2);
         name = (EditText) findViewById(R.id.name2);
@@ -54,7 +78,7 @@ public class AdminActivity extends AppCompatActivity {
                 valCategory = category.getSelectedItem().toString();
                 valName = name.getText().toString();
                 valPrice = price.getText().toString();
-                valTime = price.getText().toString();
+                valTime = time.getText().toString();
                 valCalories = calories.getText().toString();
 
                 if(valName.equals("") || valName.trim().length()==0

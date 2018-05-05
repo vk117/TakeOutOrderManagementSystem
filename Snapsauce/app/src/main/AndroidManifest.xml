@@ -20,7 +20,8 @@
         <activity android:name=".SignUp" />
         <activity android:name=".MenuActivity" />
         <activity android:name=".AdminActivity" />
-        <activity android:name=".ItemActivity"></activity>
+        <activity android:name=".ItemActivity" />
+        <activity android:name=".CartActivity"></activity>
     </application>
 
 </manifest>

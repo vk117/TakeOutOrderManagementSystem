@@ -33,12 +33,24 @@ public class DBHelper extends SQLiteOpenHelper{
                         DBSchema.TIME +
                 ")"
         );
+
+        db.execSQL("create table " + DBSchema.TABLE3_NAME + "(" +
+                "_id integer primary key autoincrement, " +
+                DBSchema.ORDERED_BY + "," +
+                DBSchema.QUANTITY + "," +
+                DBSchema.UNIT_PRICE + "," +
+                DBSchema.PREP_TIME + "," +
+                DBSchema.ITEM_NAME +
+                ")"
+        );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("drop table if exists " + DBSchema.TABLE_NAME );
         db.execSQL("drop table if exists " + DBSchema.TABLE2_NAME);
+        db.execSQL("drop table if exists " + DBSchema.TABLE3_NAME);
+
         onCreate(db);
     }
 }

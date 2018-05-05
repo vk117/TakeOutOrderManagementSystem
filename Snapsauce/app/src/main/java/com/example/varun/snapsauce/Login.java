@@ -53,6 +53,7 @@ public class Login extends AppCompatActivity {
                 else if(valueMode.equals("Admin")){
                     if(emailValue.equals("admin") && passwordValue.equals("admin")){
                         Intent myIntent = new Intent(Login.this, AdminActivity.class);
+                        myIntent.putExtra("user", "admin");
                         startActivity(myIntent);
                     }
                 }
@@ -66,6 +67,7 @@ public class Login extends AppCompatActivity {
                     if(cursor.getCount()!=0){
                         //Toast.makeText(Login.this, "Logged in", Toast.LENGTH_SHORT).show();
                         Intent myIntent = new Intent(Login.this, MenuActivity.class);
+                        myIntent.putExtra("user", emailValue);
                         startActivity(myIntent);
                     }
                     else{
