@@ -23,4 +23,11 @@ public class DBSchema{
     public static final String UNIT_PRICE = "unit_price";
     public static final String PREP_TIME = "time";
 
+    public static final String TABLE4_NAME = "orders";
+    public static final String ORDERED_BY2 = "ordered_by";
+    public static final String PREP_TIME2 = "time";
+    public static final String STATUS = "status";
+    public static final String ITEM_NAME2 = "name";
+
+
 }

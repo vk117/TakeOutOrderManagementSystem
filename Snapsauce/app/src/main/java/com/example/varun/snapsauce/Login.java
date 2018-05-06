@@ -65,10 +65,14 @@ public class Login extends AppCompatActivity {
                     Cursor cursor = database.rawQuery(query, null);
 
                     if(cursor.getCount()!=0){
-                        //Toast.makeText(Login.this, "Logged in", Toast.LENGTH_SHORT).show();
+
                         Intent myIntent = new Intent(Login.this, MenuActivity.class);
                         myIntent.putExtra("user", emailValue);
                         startActivity(myIntent);
+
+                        Intent intent = new Intent(Login.this, OrderFulfillmentService.class);
+                        intent.putExtra("user", emailValue);
+                        startService(intent);
                     }
                     else{
                         Toast.makeText(Login.this, "Wrong username/password", Toast.LENGTH_SHORT).show();

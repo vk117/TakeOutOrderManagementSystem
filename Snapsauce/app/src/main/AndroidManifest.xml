@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.varun.snapsauce">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -21,7 +23,13 @@
         <activity android:name=".MenuActivity" />
         <activity android:name=".AdminActivity" />
         <activity android:name=".ItemActivity" />
-        <activity android:name=".CartActivity"></activity>
+        <activity android:name=".CartActivity" />
+
+        <service
+            android:name=".OrderFulfillmentService"
+            android:exported="false" />
+
+        <activity android:name=".OrdersActivity"></activity>
     </application>
 
 </manifest>

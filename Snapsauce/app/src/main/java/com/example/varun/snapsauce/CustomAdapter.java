@@ -51,7 +51,7 @@ public class CustomAdapter extends ArrayAdapter<String>{
                 food_name.setText(renderable[0]);
 
                 TextView price_show = (TextView)listItem.findViewById(R.id.price_show);
-                price_show.setText("Price: $" + renderable[1]);
+                price_show.setText("$" + renderable[1]);
 
                 TextView calories_name = (TextView)listItem.findViewById(R.id.calories_name);
                 calories_name.setText("Calories: " + renderable[2]);
@@ -63,7 +63,7 @@ public class CustomAdapter extends ArrayAdapter<String>{
             food_name.setText(renderable[0]);
 
             TextView price_show = (TextView)listItem.findViewById(R.id.price_show);
-            price_show.setText("Price: $" + renderable[1]);
+            price_show.setText("$" + renderable[1]);
 
             TextView calories_name = (TextView)listItem.findViewById(R.id.calories_name);
             calories_name.setText("Calories: " + renderable[2]);

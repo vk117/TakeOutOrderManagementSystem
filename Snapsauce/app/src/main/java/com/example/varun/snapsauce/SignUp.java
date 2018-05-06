@@ -1,7 +1,10 @@
 package com.example.varun.snapsauce;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -72,6 +75,34 @@ public class SignUp extends AppCompatActivity {
                     }
                     else{
                         Toast.makeText(SignUp.this, "Signed Up", Toast.LENGTH_SHORT).show();
+                        new Thread(new Runnable() {
+
+                            public void run() {
+
+                                try {
+
+                                    GMailSender sender = new GMailSender(
+
+                                            "snapsauce17@gmail.com",
+
+                                            "Sonal@1717");
+
+                                    sender.sendMail("Welcome to the team", "On behalf of the snapsauce team, we welcome you!",
+
+                                            "snapsauce17@gmail.com",
+
+                                            emailValue.toString());
+
+                                } catch (Exception e) {
+
+                                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_LONG).show();
+
+                                }
+
+                            }
+
+                        }).start();
+
                     }
                 }
             }

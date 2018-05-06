@@ -7,6 +7,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EdgeEffect;
@@ -31,6 +33,8 @@ public class ItemActivity extends MenuActivity {
     private SQLiteDatabase database;
 
     private String quantity;
+    private int total = 0;
+    private int total_time = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +66,40 @@ public class ItemActivity extends MenuActivity {
         String calories = lines[2];
         final String time = lines[3];
 
+        qty.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                quantity = qty.getText().toString();
+                if(quantity.equals("")){quantity = "0";}
+
+                total = Integer.parseInt(price) * Integer.parseInt(quantity);
+                total_time = Integer.parseInt(time) * Integer.parseInt(quantity);
+                if(total == 0){
+                    addto.setText("Add to cart");
+                }
+                else {
+                    addto.setText("Add to cart" + " " + " " + " " + "$" + Integer.toString(total));
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
 
         heading.setText(name);
 
         textView3.setText(price);
 
         textView4.setText(calories);
+
 
         addto.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,8 +112,8 @@ public class ItemActivity extends MenuActivity {
                 ContentValues values = new ContentValues();
                 values.put(DBSchema.ORDERED_BY, user);
                 values.put(DBSchema.QUANTITY, quantity);
-                values.put(DBSchema.UNIT_PRICE, price);
-                values.put(DBSchema.PREP_TIME, time);
+                values.put(DBSchema.UNIT_PRICE, total);
+                values.put(DBSchema.PREP_TIME, total_time);
                 values.put(DBSchema.ITEM_NAME, name);
 
                 long status = database.insert(DBSchema.TABLE3_NAME, null, values);

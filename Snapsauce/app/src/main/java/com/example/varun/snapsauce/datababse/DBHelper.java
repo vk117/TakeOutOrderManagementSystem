@@ -43,6 +43,15 @@ public class DBHelper extends SQLiteOpenHelper{
                 DBSchema.ITEM_NAME +
                 ")"
         );
+
+        db.execSQL("create table " + DBSchema.TABLE4_NAME + "(" +
+                "_id integer primary key autoincrement, " +
+                DBSchema.ORDERED_BY2 + "," +
+                DBSchema.PREP_TIME2  + "," +
+                DBSchema.STATUS + "," +
+                DBSchema.ITEM_NAME2 +
+                ")"
+        );
     }
 
     @Override
@@ -50,6 +59,7 @@ public class DBHelper extends SQLiteOpenHelper{
         db.execSQL("drop table if exists " + DBSchema.TABLE_NAME );
         db.execSQL("drop table if exists " + DBSchema.TABLE2_NAME);
         db.execSQL("drop table if exists " + DBSchema.TABLE3_NAME);
+        db.execSQL("drop table if exists " + DBSchema.TABLE4_NAME);
 
         onCreate(db);
     }
