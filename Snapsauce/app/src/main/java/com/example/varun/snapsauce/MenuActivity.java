@@ -4,6 +4,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -113,6 +115,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.PRICE));
                     arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.CALORIES));
                     arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.TIME));
+                    byte[] bytes = cursor1.getBlob(cursor1.getColumnIndex("image"));
                     cursor1.moveToNext();
                 }
             }
@@ -125,6 +128,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.CALORIES));
                     arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.TIME));
                     arr[i] = arr[i] + "\n" + user;
+                    byte[] bytes = cursor1.getBlob(cursor1.getColumnIndex("image"));
                     cursor1.moveToNext();
                 }
             }
@@ -139,6 +143,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.PRICE));
                     arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.CALORIES));
                     arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.TIME));
+                    byte[] bytes = cursor2.getBlob(cursor2.getColumnIndex("image"));
                     cursor2.moveToNext();
                 }
             }
@@ -151,6 +156,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.CALORIES));
                     arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.TIME));
                     arr2[j] = arr2[j] + "\n" + user;
+                    byte[] bytes = cursor2.getBlob(cursor2.getColumnIndex("image"));
                     cursor2.moveToNext();
                 }
             }
@@ -165,6 +171,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.PRICE));
                     arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.CALORIES));
                     arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.TIME));
+                    byte[] bytes = cursor3.getBlob(cursor3.getColumnIndex("image"));
                     cursor3.moveToNext();
                 }
             }
@@ -177,6 +184,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.CALORIES));
                     arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.TIME));
                     arr3[i] = arr3[i] + "\n" + user;
+                    byte[] bytes = cursor3.getBlob(cursor3.getColumnIndex("image"));
                     cursor3.moveToNext();
                 }
             }
@@ -191,6 +199,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.PRICE));
                     arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.CALORIES));
                     arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.TIME));
+                    byte[] bytes = cursor4.getBlob(cursor4.getColumnIndex("image"));
                     cursor4.moveToNext();
                 }
             }
@@ -203,6 +212,7 @@ public class MenuActivity extends AppCompatActivity {
                     arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.CALORIES));
                     arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.TIME));
                     arr4[i] = arr4[i] + "\n" + user;
+                    byte[] bytes = cursor4.getBlob(cursor4.getColumnIndex("image"));
                     cursor4.moveToNext();
                 }
             }

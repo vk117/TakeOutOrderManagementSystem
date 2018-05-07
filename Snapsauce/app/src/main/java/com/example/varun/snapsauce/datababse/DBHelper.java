@@ -30,7 +30,8 @@ public class DBHelper extends SQLiteOpenHelper{
                         DBSchema.NAME2 + "," +
                         DBSchema.PRICE + "," +
                         DBSchema.CALORIES + "," +
-                        DBSchema.TIME +
+                        DBSchema.TIME + "," +
+                        "image" + " " + "BLOB" +
                 ")"
         );
 

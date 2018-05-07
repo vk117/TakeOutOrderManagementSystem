@@ -3,6 +3,8 @@ package com.example.varun.snapsauce;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
@@ -18,6 +20,8 @@ import android.widget.Toast;
 
 import com.example.varun.snapsauce.datababse.DBHelper;
 import com.example.varun.snapsauce.datababse.DBSchema;
+
+import java.io.ByteArrayOutputStream;
 
 public class AdminActivity extends AppCompatActivity {
 
@@ -35,6 +39,7 @@ public class AdminActivity extends AppCompatActivity {
     private String valCalories;
     private DrawerLayout drawer;
     private Button picture;
+    private byte[] bytearray;
 
     private DBHelper dbHelper;
     private SQLiteDatabase database;
@@ -78,9 +83,14 @@ public class AdminActivity extends AppCompatActivity {
         picture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(takePicture.resolveActivity(getPackageManager())!=null){
+                    startActivityForResult(takePicture, 1);
+                }
             }
         });
+
+
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +117,7 @@ public class AdminActivity extends AppCompatActivity {
                     values.put(DBSchema.PRICE, valPrice);
                     values.put(DBSchema.CALORIES, valCalories);
                     values.put(DBSchema.TIME, valTime);
+                    values.put("image", bytearray);
 
                     long status = database.insert(DBSchema.TABLE2_NAME, null, values);
                     database.close();
@@ -120,5 +131,16 @@ public class AdminActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap photo = (Bitmap) extras.get("data");
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            photo.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            bytearray = stream.toByteArray();
+        }
     }
 }
