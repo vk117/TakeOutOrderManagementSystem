@@ -29,7 +29,9 @@ public class CustomAdapter extends ArrayAdapter<String>{
 
             for(String elements: list){
                 //System.out.println(elements);
-                lines.add(elements.split("\n"));
+                if(elements!=null) {
+                    lines.add(elements.split("\n"));
+                }
             }
 
     }

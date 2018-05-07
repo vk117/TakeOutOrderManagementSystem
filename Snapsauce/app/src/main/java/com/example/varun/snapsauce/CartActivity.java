@@ -32,7 +32,7 @@ public class CartActivity extends AppCompatActivity {
     private double fPart = 0.0;
     private double minutes = 0;
     private int prep_time = 0;
-    private String items = "\n";
+    private String items="";
 
     private CustomAdapter2 adapter;
 
@@ -117,7 +117,7 @@ public class CartActivity extends AppCompatActivity {
                 ContentValues values = new ContentValues();
                 values.put(DBSchema.ORDERED_BY, user);
                 values.put(DBSchema.PREP_TIME2, prep_time);
-                values.put(DBSchema.STATUS, "incomplete");
+                values.put(DBSchema.STATUS, "Processing");
                 values.put(DBSchema.ITEM_NAME2, items);
 
                 long status = database.insert(DBSchema.TABLE4_NAME, null, values);

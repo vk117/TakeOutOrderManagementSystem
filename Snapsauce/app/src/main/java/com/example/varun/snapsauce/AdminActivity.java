@@ -34,6 +34,7 @@ public class AdminActivity extends AppCompatActivity {
     private String valTime;
     private String valCalories;
     private DrawerLayout drawer;
+    private Button picture;
 
     private DBHelper dbHelper;
     private SQLiteDatabase database;
@@ -67,10 +68,19 @@ public class AdminActivity extends AppCompatActivity {
         time = (EditText) findViewById(R.id.time);
         add = (Button) findViewById(R.id.add);
         calories = (EditText) findViewById(R.id.calories);
+        picture = (Button) findViewById(R.id.picture);
 
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.categories, android.R.layout.simple_spinner_dropdown_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         category.setAdapter(adapter);
+
+
+        picture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                
+            }
+        });
 
         add.setOnClickListener(new View.OnClickListener() {
             @Override

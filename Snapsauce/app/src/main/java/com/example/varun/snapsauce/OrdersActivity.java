@@ -35,8 +35,10 @@ public class OrdersActivity extends AppCompatActivity {
 
         String[] arr = new String[cursor.getCount()];
         for(int i=0; i<cursor.getCount(); i++){
-            arr[i] = cursor.getString(cursor.getColumnIndex(DBSchema.ITEM_NAME2)) + "\n" +
-                    cursor.getString(cursor.getColumnIndex(DBSchema.STATUS)) + "\n" + user;
+            arr[i] = cursor.getString(cursor.getColumnIndex(DBSchema.ITEM_NAME2));
+            arr[i] = arr[i] + "\n" + cursor.getString(cursor.getColumnIndex(DBSchema.STATUS));
+            arr[i] = arr[i] + "\n" + user;
+
             cursor.moveToNext();
         }
 

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import static java.security.AccessController.getContext;
+
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
@@ -41,13 +43,11 @@ public class OrderFulfillmentService extends IntentService {
         super("OrderFulfillmentService");
     }
 
-    public void timer(int i){
-
-    }
-
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+        System.out.println("Service started");
 
         Bundle extras = intent.getExtras();
         final String user = extras.getString("user");
@@ -66,11 +66,10 @@ public class OrderFulfillmentService extends IntentService {
         int i;
 
         for(i = 0; i<cursor.getCount(); i++){
-            if(cursor.getString(cursor.getColumnIndex(DBSchema.STATUS)).equals("incomplete")) {
+            if(cursor.getString(cursor.getColumnIndex(DBSchema.STATUS)).equals("Processing")) {
                 arr[i] = cursor.getString(cursor.getColumnIndex(DBSchema.ORDERED_BY2));
                 arr[i] = arr[i] + "\n" + cursor.getString(cursor.getColumnIndex(DBSchema.PREP_TIME2));
                 lines.add(arr[i].split("\n"));
-                System.out.println(cursor.getString(cursor.getColumnIndex(DBSchema.PREP_TIME2)));
                 cursor.moveToNext();
             }
             else{
@@ -78,54 +77,56 @@ public class OrderFulfillmentService extends IntentService {
             }
         }
 
-        if(shouldContinue == true) {
+
             for (i = 1; i <= lines.size(); i++) {
+            System.out.println("Loop started");
                 time = Integer.parseInt(lines.get(i - 1)[1]) * 60;
                 try {
-                    for (int a = time; a >= 0; a--) {
-                        Thread.sleep(1000);
-                        System.out.println(a);
+                        for (int a = time; a >= 0; a--) {
+                            Thread.sleep(1000);
+                            System.out.println(a);
 
-                        if (a == 0) {
+                            if (a == 0) {
 
-                            database = dbHelper.getWritableDatabase();
-                            ContentValues values = new ContentValues();
+                                database = dbHelper.getWritableDatabase();
+                                ContentValues values = new ContentValues();
 
-                            values.put(DBSchema.STATUS, "complete");
+                                values.put(DBSchema.STATUS, "Ready for pickup");
 
-                            long status = database.update(DBSchema.TABLE4_NAME, values,
-                                    DBSchema.ORDERED_BY2 + "=" + "'" + lines.get(i - 1)[0] + "'", null);
+                                long status = database.update(DBSchema.TABLE4_NAME, values,
+                                        DBSchema.ORDERED_BY2 + "=" + "'" + lines.get(i - 1)[0] + "'", null);
 
 
-                            new Thread(new Runnable() {
+                                new Thread(new Runnable() {
 
-                                public void run() {
+                                    public void run() {
 
-                                    try {
+                                        try {
 
-                                        GMailSender sender = new GMailSender(
+                                            GMailSender sender = new GMailSender(
 
-                                                "snapsauce17@gmail.com",
+                                                    "snapsauce17@gmail.com",
 
-                                                "Sonal@1717");
+                                                    "Sonal@1717");
 
-                                        sender.sendMail("Thank you ", "Thank you for ordering with Snapsauce! \nEnjoy your meal!",
+                                            sender.sendMail("Thank you ", "Thank you for ordering with Snapsauce! \nEnjoy your meal!",
 
-                                                "snapsauce17@gmail.com",
+                                                    "snapsauce17@gmail.com",
 
-                                                user.toString());
+                                                    user.toString());
 
-                                    } catch (Exception e) {
+                                        } catch (Exception e) {
 
-                                        Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
+
+                                        }
 
                                     }
 
-                                }
+                                }).start();
 
-                            }).start();
 
-                            if (a < 600) {
+                            } else if (a == 600) {
                                 new Thread(new Runnable() {
 
                                     public void run() {
@@ -155,16 +156,12 @@ public class OrderFulfillmentService extends IntentService {
                                 }).start();
                             }
                         }
-                    }
+
                 } catch (InterruptedException e) {
                     System.out.println("Interrupted !");
                 }
             }
-        }
-        else {
-            stopSelf();
-            return;
-        }
+
     }
 
 

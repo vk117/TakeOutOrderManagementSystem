@@ -74,6 +74,19 @@
 
         <Button
             android:layout_gravity="center|bottom"
+            android:id="@+id/picture"
+            android:textSize="17sp"
+            android:text="Take Picture"
+            android:textAllCaps="false"
+            android:layout_marginTop="50dp"
+            android:textColor="@android:color/white"
+            android:background="@drawable/start_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <Button
+            android:layout_gravity="center|bottom"
             android:id="@+id/add"
             android:textSize="17sp"
             android:text="Add"

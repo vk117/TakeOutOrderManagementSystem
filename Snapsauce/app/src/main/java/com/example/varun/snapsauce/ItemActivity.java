@@ -26,6 +26,8 @@ public class ItemActivity extends MenuActivity {
     private TextView heading;
     private TextView textView3;
     private TextView textView4;
+    private TextView textView9;
+    private TextView textView10;
     private Button addto;
     private EditText qty;
 
@@ -46,6 +48,10 @@ public class ItemActivity extends MenuActivity {
         textView4 = (TextView) findViewById(R.id.textView4);
         qty = (EditText) findViewById(R.id.qty);
         addto = (Button) findViewById(R.id.addtocart);
+
+        textView9 = (TextView) findViewById(R.id.textView9);
+        textView10 = (TextView) findViewById(R.id.textView10);
+
 
 
         Bundle extras = getIntent().getExtras();
@@ -81,9 +87,13 @@ public class ItemActivity extends MenuActivity {
                 total_time = Integer.parseInt(time) * Integer.parseInt(quantity);
                 if(total == 0){
                     addto.setText("Add to cart");
+                    addto.setEnabled(false);
+                    addto.setAlpha(0.5f);
                 }
                 else {
                     addto.setText("Add to cart" + " " + " " + " " + "$" + Integer.toString(total));
+                    addto.setEnabled(true);
+                    addto.setAlpha(1.0f);
                 }
             }
 
@@ -96,9 +106,14 @@ public class ItemActivity extends MenuActivity {
 
         heading.setText(name);
 
-        textView3.setText(price);
+        textView3.setText("Price");
 
-        textView4.setText(calories);
+        textView4.setText("Calories");
+
+        textView9.setText(price);
+
+        textView10.setText(calories);
+
 
 
         addto.setOnClickListener(new View.OnClickListener() {

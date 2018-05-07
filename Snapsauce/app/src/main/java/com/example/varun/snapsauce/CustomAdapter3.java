@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.varun.snapsauce.datababse.*;
@@ -57,19 +58,28 @@ public class CustomAdapter3 extends ArrayAdapter<String> {
             status.setText(renderable[1]);
 
             Button cancel = (Button) listItem.findViewById(R.id.cancel_order);
-            cancel.setClickable(true);
-            cancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    dbHelper = new DBHelper(getContext());
-                    db = dbHelper.getWritableDatabase();
-                    long status = db.delete(DBSchema.TABLE4_NAME, DBSchema.ITEM_NAME2 + "=" + "'" + renderable[0] + "'" +
-                        " AND " + DBSchema.ORDERED_BY2 + "=" + "'" + renderable[2] + "'", null);
+            if(renderable[1].equals("complete")){
+                System.out.println("Button should be invisible");
+                cancel.setVisibility(View.GONE);
 
-                    OrderFulfillmentService.shouldContinue = false;
-                    ((OrdersActivity)getContext()).recreate();
-                }
-            });
+            }
+            else {
+                cancel.setVisibility(View.VISIBLE);
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dbHelper = new DBHelper(getContext());
+                        db = dbHelper.getWritableDatabase();
+
+                        String sql = "DELETE FROM " + DBSchema.TABLE4_NAME + " WHERE " + " ( " + DBSchema.ITEM_NAME2 + "=" + "'" + renderable[0] + "'" +
+                                " AND " + DBSchema.ORDERED_BY2 + "=" + "'" + renderable[2] + "'" + " ) ";
+                        db.execSQL(sql);
+
+                        OrderFulfillmentService.shouldContinue = false;
+                        ((OrdersActivity) getContext()).recreate();
+                    }
+                });
+            }
         }
         return  listItem;
     }

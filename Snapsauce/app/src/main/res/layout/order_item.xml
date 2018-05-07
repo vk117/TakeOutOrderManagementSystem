@@ -21,22 +21,16 @@
         android:text="Large Text"
         android:textSize="15sp"
         android:id="@+id/status"
-        android:layout_marginLeft="75dp"
+        android:layout_marginLeft="50dp"
         android:textColor="#F44336"/>
 
     <Button
         android:id="@+id/cancel_order"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_gravity="center|bottom"
-        android:background="@drawable/start_button"
-        android:text="Cancel Order"
-        android:textAllCaps="false"
-        android:textColor="@android:color/white"
-        android:textSize="17sp" />
-
+        android:layout_marginLeft="50dp"
+        android:text="Cancel"
+        android:visibility="invisible"/>
 
 
 </LinearLayout>
