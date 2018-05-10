@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.example.varun.snapsauce.CustomAdapter;
 
 import com.example.varun.snapsauce.R;
 

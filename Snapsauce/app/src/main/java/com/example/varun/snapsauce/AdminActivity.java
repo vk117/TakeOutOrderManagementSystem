@@ -21,6 +21,10 @@ import android.widget.Toast;
 import com.example.varun.snapsauce.datababse.DBHelper;
 import com.example.varun.snapsauce.datababse.DBSchema;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 
 public class AdminActivity extends AppCompatActivity {
@@ -44,6 +48,7 @@ public class AdminActivity extends AppCompatActivity {
     private DBHelper dbHelper;
     private SQLiteDatabase database;
     private String user;
+    private String requestbody;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +112,7 @@ public class AdminActivity extends AppCompatActivity {
                     Toast.makeText(AdminActivity.this, R.string.fillAll, Toast.LENGTH_SHORT).show();
                 }
                 else {
-                    dbHelper = new DBHelper(AdminActivity.this);
+                    /*dbHelper = new DBHelper(AdminActivity.this);
                     database = dbHelper.getWritableDatabase();
 
                     ContentValues values = new ContentValues();
@@ -127,7 +132,41 @@ public class AdminActivity extends AppCompatActivity {
                     }
                     else{
                         Toast.makeText(AdminActivity.this, "Item added", Toast.LENGTH_SHORT).show();
+                    }*/
+
+
+                    Api api = new Api();
+
+                    try{
+                        JSONObject json = new JSONObject();
+
+                        json.put("category", valCategory);
+                        json.put("name", valName);
+                        json.put("price",  valPrice);
+                        json.put("calories", valCalories);
+                        json.put("time", valTime);
+
+                        requestbody = json.toString();
+                    }catch (JSONException e){
+                        e.printStackTrace();
                     }
+
+                    api.post(AdminActivity.this, requestbody, "addproduct", new VolleyCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            if(result.equals("200")){
+                                Toast.makeText(AdminActivity.this, "Item added", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(AdminActivity.this, "Item could not be added", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onSuccessJSON(JSONArray array){}
+                    });
+
+
                 }
             }
         });

@@ -11,8 +11,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.varun.snapsauce.datababse.*;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -65,11 +68,26 @@ public class CustomAdapter2 extends ArrayAdapter<String> {
             remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    dbHelper = new DBHelper(getContext());
-                    database = dbHelper.getWritableDatabase();
-                    long status = database.delete(DBSchema.TABLE3_NAME, DBSchema.ITEM_NAME + "=" + "'" + renderable[0] + "'" + " " +
-                    "AND " + DBSchema.ORDERED_BY + "=" + "'" + renderable[2] + "'", null );
-                    //System.out.println(status);
+
+                    Api api = new Api();
+
+                    api.delete(context, "deletecart/".concat(renderable[0]).concat("&").concat(renderable[2]), new VolleyCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            if(result.equals("200")){
+                                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(context, "Not Deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onSuccessJSON(JSONArray arr) {
+
+                        }
+                    });
+
                     ((CartActivity)getContext()).recreate();
                 }
             });

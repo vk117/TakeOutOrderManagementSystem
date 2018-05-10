@@ -4,14 +4,34 @@ import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.varun.snapsauce.datababse.*;
 import android.database.Cursor;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Login extends AppCompatActivity {
 
@@ -58,26 +78,33 @@ public class Login extends AppCompatActivity {
                     }
                 }
                 else{
-                    dbHelper = new DBHelper(Login.this);
-                    database = dbHelper.getReadableDatabase();
-                    String query = "SELECT * FROM " + DBSchema.TABLE_NAME + " WHERE " + DBSchema.EMAIL + "=" + "'" + emailValue + "'" +
-                            " AND " + DBSchema.PASSWORD + "=" + "'" + passwordValue + "'";
-                    Cursor cursor = database.rawQuery(query, null);
+                    
+                    Api api = new Api();
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("email", emailValue);
+                    api.get(Login.this, "check/".concat(emailValue).concat("&").concat(passwordValue),new VolleyCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            if(result.equals("200")){
 
-                    if(cursor.getCount()!=0){
+                                Intent myIntent = new Intent(Login.this, MenuActivity.class);
+                                myIntent.putExtra("user", emailValue);
+                                startActivity(myIntent);
 
-                        Intent myIntent = new Intent(Login.this, MenuActivity.class);
-                        myIntent.putExtra("user", emailValue);
-                        startActivity(myIntent);
+                                Intent intent = new Intent(Login.this, OrderFulfillmentService.class);
+                                intent.putExtra("user", emailValue);
+                                startActivity(intent);
+                            }
+                            else{
+                                Toast.makeText(Login.this, "Failed to log in", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
-                        Intent intent = new Intent(Login.this, OrderFulfillmentService.class);
-                        intent.putExtra("user", emailValue);
-                        startService(intent);
-                    }
-                    else{
-                        Toast.makeText(Login.this, "Wrong username/password", Toast.LENGTH_SHORT).show();
-                    }
+                        @Override
+                        public void onSuccessJSON(JSONArray arr){}
+                    });
                 }
+
             }
         });
 

@@ -8,6 +8,11 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.varun.snapsauce.datababse.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.List;
+
 public class OrdersActivity extends AppCompatActivity {
 
     private ListView orders;
@@ -16,15 +21,20 @@ public class OrdersActivity extends AppCompatActivity {
 
     private CustomAdapter3 adapter;
 
+    private String[] arr;
+    private String user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
 
         Bundle bundle = getIntent().getExtras();
-        String user = bundle.getString("user");
+         user = bundle.getString("user");
 
-        orders = (ListView) findViewById(R.id.orders);
+         orders = (ListView) findViewById(R.id.orders);
+
+        /*orders = (ListView) findViewById(R.id.orders);
         dbHelper = new DBHelper(OrdersActivity.this);
         db = dbHelper.getReadableDatabase();
 
@@ -44,7 +54,37 @@ public class OrdersActivity extends AppCompatActivity {
 
         adapter = new CustomAdapter3(OrdersActivity.this, arr);
 
-        orders.setAdapter(adapter);
+        orders.setAdapter(adapter);*/
+
+
+        Api api = new Api();
+
+        api.getJSON(OrdersActivity.this, "getorders/".concat(user), new VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
+
+            }
+
+            @Override
+            public void onSuccessJSON(JSONArray array) {
+
+                arr = new String[array.length()];
+                try{
+                    for(int i=0; i<array.length(); i++){
+                        arr[i] = array.getJSONObject(i).getString("name");
+                        arr[i] = arr[i] + "\n" + array.getJSONObject(i).getString("status");
+                        arr[i] = arr[i] + "\n" + user;
+                        System.out.println(arr[i]);
+                    }
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+
+                adapter = new CustomAdapter3(OrdersActivity.this, arr);
+
+                orders.setAdapter(adapter);
+            }
+        });
 
 
     }

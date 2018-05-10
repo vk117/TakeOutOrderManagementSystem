@@ -18,6 +18,10 @@ import com.example.varun.snapsauce.CustomAdapter2;
 
 import com.example.varun.snapsauce.datababse.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class CartActivity extends AppCompatActivity {
 
     private ListView orders;
@@ -33,6 +37,9 @@ public class CartActivity extends AppCompatActivity {
     private double minutes = 0;
     private int prep_time = 0;
     private String items="";
+    private String[] arr;
+    private int price = 0;
+    private String requestbody;
 
     private CustomAdapter2 adapter;
 
@@ -48,88 +55,135 @@ public class CartActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         final String user = extras.getString("user");
 
-        dbHelper = new DBHelper(CartActivity.this);
-        database = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + DBSchema.TABLE3_NAME + " " + "WHERE " + DBSchema.ORDERED_BY + "=" + "'" + user + "'";
-        Cursor cursor = database.rawQuery(query, null);
+        Api api = new Api();
 
-        String[] arr = new String[cursor.getCount()];
-        int price = 0;
-        cursor.moveToFirst();
+        api.getJSON(CartActivity.this, "getcart/".concat(user), new VolleyCallback() {
+            @Override
+            public void onSuccess(String result) {
 
-        int i = 0;
+            }
 
-        for(i = 0; i<cursor.getCount(); i++){
-            arr[i] = cursor.getString(cursor.getColumnIndex(DBSchema.ITEM_NAME)) + "\n" + "$" + cursor.getString(cursor.getColumnIndex(DBSchema.UNIT_PRICE)) +
-            "\n" + cursor.getString(cursor.getColumnIndex(DBSchema.ORDERED_BY)) + "\n" + cursor.getString(cursor.getColumnIndex(DBSchema.QUANTITY));
-            price = price + Integer.parseInt(cursor.getString(cursor.getColumnIndex(DBSchema.UNIT_PRICE)));
-            prep_time = prep_time + Integer.parseInt(cursor.getString(cursor.getColumnIndex(DBSchema.PREP_TIME)));
-            items = items + cursor.getString(cursor.getColumnIndex(DBSchema.ITEM_NAME));
-            cursor.moveToNext();
-        }
+            @Override
+            public void onSuccessJSON(JSONArray array) {
 
-        System.out.println(prep_time);
+                arr = new String[array.length()];
 
-        if(prep_time>60) {
-             frac = prep_time / 60;
-             hours = (long) frac;
-             fPart = frac - hours;
-             minutes = fPart * 60;
-        }
+                for(int i=0; i<array.length(); i++){
+                    try {
+                        arr[i] = array.getJSONObject(i).getString("name") + "\n" + "$" + array.getJSONObject(i).getString("unitPrice") +
+                                "\n" + array.getJSONObject(i).getString("orderBy") + "\n" + array.getJSONObject(i).getString("quantity");
 
-        else {
-            minutes = prep_time;
-        }
+                        price = price + Integer.parseInt(array.getJSONObject(i).getString("unitPrice"));
+                        prep_time = prep_time + Integer.parseInt(array.getJSONObject(i).getString("prepTime"));
+                        items = items + array.getJSONObject(i).getString("name");
+
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                }
+
+                adapter = new CustomAdapter2(CartActivity.this, arr);
+
+                orders.setAdapter(adapter);
 
 
-        for(String order: arr){
-            System.out.println(order);
-        }
+                System.out.println(prep_time);
 
-        /*ArrayAdapter<String> foodAdapter =
-                new ArrayAdapter<String>(this, R.layout.food_item, R.id.food_name, arr);*/
+                if(prep_time>60) {
+                    frac = prep_time / 60;
+                    hours = (long) frac;
+                    fPart = frac - hours;
+                    minutes = fPart * 60;
+                }
 
-        adapter = new CustomAdapter2(CartActivity.this, arr);
+                else {
+                    minutes = prep_time;
+                }
 
-        orders.setAdapter(adapter);
+
+                for(String order: arr){
+                    System.out.println(order);
+                }
 
 
-        if(price!=0) {
-            placeOrder.setEnabled(true);
-            placeOrder.setAlpha(1.0f);
-            placeOrder.setText("Place Pickup Order" + " " + " " + " " + "$" + Integer.toString(price));
-        }
-        else{
-            placeOrder.setEnabled(false);
-            placeOrder.setAlpha(.5f);
-            placeOrder.setText("Place Pickup Order");
-        }
+
+                if(price!=0) {
+                    placeOrder.setEnabled(true);
+                    placeOrder.setAlpha(1.0f);
+                    placeOrder.setText("Place Pickup Order" + " " + " " + " " + "$" + Integer.toString(price));
+                }
+                else{
+                    placeOrder.setEnabled(false);
+                    placeOrder.setAlpha(.5f);
+                    placeOrder.setText("Place Pickup Order");
+                }
+            }
+        });
+
+
+
 
         orders.setClickable(true);
 
         placeOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dbHelper = new DBHelper(CartActivity.this);
-                database = dbHelper.getWritableDatabase();
 
-                ContentValues values = new ContentValues();
-                values.put(DBSchema.ORDERED_BY, user);
-                values.put(DBSchema.PREP_TIME2, prep_time);
-                values.put(DBSchema.STATUS, "Processing");
-                values.put(DBSchema.ITEM_NAME2, items);
+                Api api = new Api();
 
-                long status = database.insert(DBSchema.TABLE4_NAME, null, values);
-                if(status==-1){
-                    Toast.makeText(CartActivity.this, "Order cannot be placed", Toast.LENGTH_SHORT).show();
+                try{
+                    JSONObject jsonbody = new JSONObject();
+
+                    jsonbody.put("orderBy", user);
+                    jsonbody.put("prepTime", prep_time);
+                    jsonbody.put("status", "Processing");
+                    jsonbody.put("name", items);
+
+                    requestbody = jsonbody.toString();
+                }catch (JSONException e){
+                    e.printStackTrace();
                 }
-                else{
-                    Toast.makeText(CartActivity.this, "Order Placed", Toast.LENGTH_SHORT).show();
-                }
 
-                database.delete(DBSchema.TABLE3_NAME, DBSchema.ORDERED_BY + "=" + "'" + user + "'", null);
+                api.post(CartActivity.this, requestbody, "addorder", new VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        if(result.equals("200")){
+                            Toast.makeText(CartActivity.this, "Ordered", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            Toast.makeText(CartActivity.this, "Not Ordered", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onSuccessJSON(JSONArray arr) {
+
+                    }
+                });
+
+
+
+                api.delete(CartActivity.this, "deletecart/".concat(user), new VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        if(result.equals("200")){
+                            System.out.println("Order placed");
+                        }
+                        else{
+                            System.out.println("There was some error");
+                        }
+                    }
+
+                    @Override
+                    public void onSuccessJSON(JSONArray arr) {
+
+                    }
+                });
+
                 recreate();
+
+
                 Intent intent = new Intent(CartActivity.this, OrderFulfillmentService.class);
                 intent.putExtra("user", user);
                 startService(intent);

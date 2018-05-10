@@ -9,10 +9,24 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.varun.snapsauce.datababse.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -38,6 +52,10 @@ public class OrderFulfillmentService extends IntentService {
     private int time=0;
     private String status = "complete";
     public static volatile boolean shouldContinue = true;
+    private String jsonbody;
+    private boolean exec = true;
+    private String URL = "http://ec2-54-193-101-253.us-west-1.compute.amazonaws.com:8080/";
+    private JSONArray jsonArray;
 
     public OrderFulfillmentService() {
         super("OrderFulfillmentService");
@@ -52,115 +70,161 @@ public class OrderFulfillmentService extends IntentService {
         Bundle extras = intent.getExtras();
         final String user = extras.getString("user");
 
-        dbHelper = new DBHelper(OrderFulfillmentService.this);
-        database = dbHelper.getReadableDatabase();
 
-        String query = "SELECT * FROM " + DBSchema.TABLE4_NAME;
-        Cursor cursor = database.rawQuery(query, null);
-        cursor.moveToFirst();
 
-        arr = new String[cursor.getCount()];
-        order_by = new String[cursor.getCount()];
-        prep_time = new String[cursor.getCount()];
+        RequestQueue queue = Volley.newRequestQueue(OrderFulfillmentService.this);
 
-        int i;
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, URL.concat("getorders/"),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
 
-        for(i = 0; i<cursor.getCount(); i++){
-            if(cursor.getString(cursor.getColumnIndex(DBSchema.STATUS)).equals("Processing")) {
-                arr[i] = cursor.getString(cursor.getColumnIndex(DBSchema.ORDERED_BY2));
-                arr[i] = arr[i] + "\n" + cursor.getString(cursor.getColumnIndex(DBSchema.PREP_TIME2));
-                lines.add(arr[i].split("\n"));
-                cursor.moveToNext();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                System.out.println("That didn't work");
             }
-            else{
-                cursor.moveToNext();
-            }
-        }
+        }){
+            @Override
+            protected Response<String> parseNetworkResponse(NetworkResponse response) {
+                String responseString = "";
+                if (response != null) {
 
+                    try {
+                        responseString = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+                        System.out.println(responseString);
+                    }catch (UnsupportedEncodingException e){
+                        e.printStackTrace();
+                    }
 
-            for (i = 1; i <= lines.size(); i++) {
-            System.out.println("Loop started");
-                time = Integer.parseInt(lines.get(i - 1)[1]) * 60;
-                try {
-                        for (int a = time; a >= 0; a--) {
-                            Thread.sleep(1000);
-                            System.out.println(a);
+                    try {
+                        jsonArray = new JSONArray(responseString);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
-                            if (a == 0) {
+                    arr = new String[jsonArray.length()];
+                    order_by = new String[jsonArray.length()];
+                    prep_time = new String[jsonArray.length()];
 
-                                database = dbHelper.getWritableDatabase();
-                                ContentValues values = new ContentValues();
-
-                                values.put(DBSchema.STATUS, "Ready for pickup");
-
-                                long status = database.update(DBSchema.TABLE4_NAME, values,
-                                        DBSchema.ORDERED_BY2 + "=" + "'" + lines.get(i - 1)[0] + "'", null);
-
-
-                                new Thread(new Runnable() {
-
-                                    public void run() {
-
-                                        try {
-
-                                            GMailSender sender = new GMailSender(
-
-                                                    "snapsauce17@gmail.com",
-
-                                                    "Sonal@1717");
-
-                                            sender.sendMail("Thank you ", "Thank you for ordering with Snapsauce! \nEnjoy your meal!",
-
-                                                    "snapsauce17@gmail.com",
-
-                                                    user.toString());
-
-                                        } catch (Exception e) {
-
-                                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-
-                                        }
-
-                                    }
-
-                                }).start();
-
-
-                            } else if (a == 600) {
-                                new Thread(new Runnable() {
-
-                                    public void run() {
-
-                                        try {
-
-                                            GMailSender sender = new GMailSender(
-
-                                                    "snapsauce17@gmail.com",
-
-                                                    "Sonal@1717");
-
-                                            sender.sendMail("Hope you are hungry ", "Hi! \nYour order is almost ready",
-
-                                                    "snapsauce17@gmail.com",
-
-                                                    user.toString());
-
-                                        } catch (Exception e) {
-
-                                            Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_LONG).show();
-
-                                        }
-
-                                    }
-
-                                }).start();
+                    for(int i=0; i<jsonArray.length(); i++){
+                        try{
+                            if(jsonArray.getJSONObject(i).getString("status").equals("Processing")){
+                                arr[i] = jsonArray.getJSONObject(i).getString("orderBy");
+                                arr[i] = arr[i] + "\n" + jsonArray.getJSONObject(i).getString("prepTime");
+                                lines.add(arr[i].split("\n"));
+                                //System.out.println(arr[i]);
                             }
+                        }catch (JSONException e){
+                            e.printStackTrace();
                         }
+                    }
 
-                } catch (InterruptedException e) {
-                    System.out.println("Interrupted !");
+                    for (int i = 0; i < lines.size(); i++) {
+                        System.out.println("Loop started");
+                        exec = true;
+                        time = Integer.parseInt(lines.get(i)[1]) * 60;
+                        try {
+                            for (int a = time; a >= 0; a--) {
+                                Thread.sleep(1000);
+                                System.out.println(a);
+
+                                if (a == 0) {
+
+
+
+                                    try{
+                                        JSONObject jsonObject = new JSONObject();
+                                        jsonObject.put("user", lines.get(i)[0]);
+                                        jsonbody = jsonObject.toString();
+                                    }catch (JSONException e){
+                                        e.printStackTrace();
+                                    }
+
+                                    Api api2 = new Api();
+                                    api2.post(OrderFulfillmentService.this, jsonbody, "updatestatus", new VolleyCallback() {
+                                        @Override
+                                        public void onSuccess(String result) {
+
+                                        }
+
+                                        @Override
+                                        public void onSuccessJSON(JSONArray arr) {
+
+                                        }
+                                    });
+
+
+                                    new Thread(new Runnable() {
+
+                                        public void run() {
+
+                                            try {
+
+                                                GMailSender sender = new GMailSender(
+
+                                                        "snapsauce17@gmail.com",
+
+                                                        "Sonal@1717");
+
+                                                sender.sendMail("Thank you ", "Thank you for ordering with Snapsauce! \nEnjoy your meal!",
+
+                                                        "snapsauce17@gmail.com",
+
+                                                        user.toString());
+
+                                            } catch (Exception e) {
+
+                                            }
+
+                                        }
+
+                                    }).start();
+
+
+                                } else if (a < 600 && exec) {
+                                    exec = false;
+                                    new Thread(new Runnable() {
+
+                                        public void run() {
+
+                                            try {
+
+                                                GMailSender sender = new GMailSender(
+
+                                                        "snapsauce17@gmail.com",
+
+                                                        "Sonal@1717");
+
+                                                sender.sendMail("Hope you are hungry ", "Hi! \nYour order is almost ready",
+
+                                                        "snapsauce17@gmail.com",
+
+                                                        user.toString());
+
+                                            } catch (Exception e) {
+
+
+                                            }
+
+                                        }
+
+                                    }).start();
+                                }
+                            }
+
+                        } catch (InterruptedException e) {
+                            System.out.println("Interrupted !");
+                        }
+                    }
                 }
+
+                return Response.success(responseString, HttpHeaderParser.parseCacheHeaders(response));
             }
+        };
+
+        queue.add(stringRequest);
 
     }
 

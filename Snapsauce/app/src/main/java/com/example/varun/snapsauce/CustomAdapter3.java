@@ -11,8 +11,11 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.varun.snapsauce.datababse.*;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 
@@ -68,12 +71,32 @@ public class CustomAdapter3 extends ArrayAdapter<String> {
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dbHelper = new DBHelper(getContext());
+                        /*dbHelper = new DBHelper(getContext());
                         db = dbHelper.getWritableDatabase();
 
                         String sql = "DELETE FROM " + DBSchema.TABLE4_NAME + " WHERE " + " ( " + DBSchema.ITEM_NAME2 + "=" + "'" + renderable[0] + "'" +
                                 " AND " + DBSchema.ORDERED_BY2 + "=" + "'" + renderable[2] + "'" + " ) ";
-                        db.execSQL(sql);
+                        db.execSQL(sql);*/
+
+                        Api api = new Api();
+
+                        api.delete(context, "deleteorder/".concat(renderable[0]).concat("&").concat(renderable[2]), new VolleyCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                System.out.println(result);
+                                if(result.equals("200")){
+                                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show();
+                                }
+                                else{
+                                    Toast.makeText(context, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onSuccessJSON(JSONArray arr) {
+
+                            }
+                        });
 
                         OrderFulfillmentService.shouldContinue = false;
                         ((OrdersActivity) getContext()).recreate();

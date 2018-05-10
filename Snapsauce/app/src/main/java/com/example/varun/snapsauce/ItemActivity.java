@@ -19,6 +19,10 @@ import com.example.varun.snapsauce.MenuActivity;
 
 import com.example.varun.snapsauce.datababse.*;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Scanner;
 
 public class ItemActivity extends MenuActivity {
@@ -37,6 +41,7 @@ public class ItemActivity extends MenuActivity {
     private String quantity;
     private int total = 0;
     private int total_time = 0;
+    private String requestbody;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +126,7 @@ public class ItemActivity extends MenuActivity {
             public void onClick(View v) {
                 quantity = qty.getText().toString();
 
-                dbHelper = new DBHelper(ItemActivity.this);
+                /*dbHelper = new DBHelper(ItemActivity.this);
                 database = dbHelper.getWritableDatabase();
 
                 ContentValues values = new ContentValues();
@@ -141,7 +146,47 @@ public class ItemActivity extends MenuActivity {
                     Intent myIntent = new Intent(ItemActivity.this, CartActivity.class);
                     myIntent.putExtra("user", user);
                     startActivity(myIntent);
+                    finish();
+
+                }*/
+
+                Api api = new Api();
+
+                try{
+                    JSONObject jsonObject = new JSONObject();
+
+                    jsonObject.put("orderBy", user);
+                    jsonObject.put("name", name);
+                    jsonObject.put("quantity", quantity);
+                    jsonObject.put("unitPrice", total);
+                    jsonObject.put("prepTime", total_time);
+
+                    requestbody = jsonObject.toString();
+                }catch (JSONException e){
+                    e.printStackTrace();
                 }
+
+                api.post(ItemActivity.this, requestbody, "addtocart", new VolleyCallback() {
+                    @Override
+                    public void onSuccess(String result) {
+                        if(result.equals("200")){
+                            Toast.makeText(ItemActivity.this, "Item added to the cart", Toast.LENGTH_SHORT).show();
+
+                            Intent myIntent = new Intent(ItemActivity.this, CartActivity.class);
+                            myIntent.putExtra("user", user);
+                            startActivity(myIntent);
+                            finish();
+                        }
+                        else{
+                            Toast.makeText(ItemActivity.this, "Cannot add to cart", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                    @Override
+                    public void onSuccessJSON(JSONArray arr) {
+
+                    }
+                });
 
             }
         });

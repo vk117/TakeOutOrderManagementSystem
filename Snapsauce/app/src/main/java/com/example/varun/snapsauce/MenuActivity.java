@@ -19,9 +19,14 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
+
 import com.example.varun.snapsauce.datababse.*;
 import com.example.varun.snapsauce.CustomAdapter;
 import com.example.varun.snapsauce.datababse.*;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class MenuActivity extends AppCompatActivity {
 
@@ -39,6 +44,11 @@ public class MenuActivity extends AppCompatActivity {
     private CustomAdapter adapter2;
     private CustomAdapter adapter3;
     private CustomAdapter adapter4;
+
+    private String[] arr;
+    private String[] arr2;
+    private String[] arr3;
+    private String[] arr4;
 
 
     @Override
@@ -82,169 +92,121 @@ public class MenuActivity extends AppCompatActivity {
         user = extras.getString("user");
 
 
+        Api api1 = new Api();
+        api1.getJSON(MenuActivity.this, "getproducts/".concat("Drink"), new VolleyCallback() {
+            @Override
+            public void onSuccessJSON(JSONArray array) {
+                arr = new String[array.length()];
 
-        dbHelper = new DBHelper(MenuActivity.this);
-        db = dbHelper.getReadableDatabase();
-
-        String query1 = "SELECT * FROM " + DBSchema.TABLE2_NAME + " WHERE " + DBSchema.CATEGORY + "=" + "'" + "Drink" + "'";
-        Cursor cursor1 = db.rawQuery(query1, null);
-
-        String query2 = "SELECT * FROM " + DBSchema.TABLE2_NAME + " WHERE " + DBSchema.CATEGORY + "=" + "'" + "Appetizer" + "'";
-        Cursor cursor2 = db.rawQuery(query2, null);
-
-        String query3 = "SELECT * FROM " + DBSchema.TABLE2_NAME + " WHERE " + DBSchema.CATEGORY + "=" + "'" + "Main course" + "'";
-        Cursor cursor3 = db.rawQuery(query3, null);
-
-        String query4 = "SELECT * FROM " + DBSchema.TABLE2_NAME + " WHERE " + DBSchema.CATEGORY + "=" + "'" + "Dessert" + "'";
-        Cursor cursor4 = db.rawQuery(query4, null);
-
-        int i = 0;
-        int j = 0;
-
-        String[] arr = new String[cursor1.getCount()];
-        String[] arr2 = new String[cursor2.getCount()];
-        String[] arr3 = new String[cursor3.getCount()];
-        String[] arr4 = new String[cursor4.getCount()];
-
-        cursor1.moveToFirst();
-
-        if(!user.equals("admin")) {
-            if(cursor1.getCount()>0) {
-                for (i = 0; i < cursor1.getCount(); i++) {
-                    arr[i] = cursor1.getString(cursor1.getColumnIndex(DBSchema.NAME2));
-                    arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.PRICE));
-                    arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.CALORIES));
-                    arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.TIME));
-                    byte[] bytes = cursor1.getBlob(cursor1.getColumnIndex("image"));
-                    cursor1.moveToNext();
+                for(int i=0; i<array.length(); i++){
+                    try{
+                        arr[i] = array.getJSONObject(i).getString("name");
+                        arr[i] = arr[i] + "\n" + array.getJSONObject(i).getString("price");
+                        arr[i] = arr[i] + "\n" + array.getJSONObject(i).getString("calories");
+                        arr[i] = arr[i] + "\n" + array.getJSONObject(i).getString("time");
+                        arr[i] = arr[i] + "\n" + user;
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
                 }
+                adapter = new CustomAdapter(MenuActivity.this, arr);
+                drink.setAdapter(adapter);
+                ListUtils.setDynamicHeight(drink);
             }
-        }
-        else{
-            if(cursor1.getCount()>0) {
-                for (i = 0; i < cursor1.getCount(); i++) {
-                    arr[i] = cursor1.getString(cursor1.getColumnIndex(DBSchema.NAME2));
-                    arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.PRICE));
-                    arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.CALORIES));
-                    arr[i] = arr[i] + "\n" + cursor1.getString(cursor1.getColumnIndex(DBSchema.TIME));
-                    arr[i] = arr[i] + "\n" + user;
-                    byte[] bytes = cursor1.getBlob(cursor1.getColumnIndex("image"));
-                    cursor1.moveToNext();
+
+            @Override
+            public void onSuccess(String result){}
+        });
+
+
+        Api api2 = new Api();
+        api2.getJSON(MenuActivity.this, "getproducts/".concat("Appetizer"), new VolleyCallback() {
+            @Override
+            public void onSuccessJSON(JSONArray array) {
+                arr2 = new String[array.length()];
+
+                for(int i=0; i<array.length(); i++){
+                    try{
+                        arr2[i] = array.getJSONObject(i).getString("name");
+                        arr2[i] = arr2[i] + "\n" + array.getJSONObject(i).getString("price");
+                        arr2[i] = arr2[i] + "\n" + array.getJSONObject(i).getString("calories");
+                        arr2[i] = arr2[i] + "\n" + array.getJSONObject(i).getString("time");
+                        arr2[i] = arr2[i] + "\n" + user;
+                        System.out.println(arr2[i]);
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
                 }
+                adapter2 = new CustomAdapter(MenuActivity.this, arr2);
+                appetizer.setAdapter(adapter2);
+                ListUtils.setDynamicHeight(appetizer);
             }
-        }
 
-        cursor2.moveToFirst();
+            @Override
+            public void onSuccess(String result){}
+        });
 
-        if(!user.equals("admin")) {
-            if(cursor2.getCount()>0) {
-                for (j = 0; j < cursor2.getCount(); j++) {
-                    arr2[j] = cursor2.getString(cursor2.getColumnIndex(DBSchema.NAME2));
-                    arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.PRICE));
-                    arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.CALORIES));
-                    arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.TIME));
-                    byte[] bytes = cursor2.getBlob(cursor2.getColumnIndex("image"));
-                    cursor2.moveToNext();
+
+        Api api3 = new Api();
+        api3.getJSON(MenuActivity.this, "getproducts/".concat("Main course"), new VolleyCallback() {
+            @Override
+            public void onSuccessJSON(JSONArray array) {
+                arr3 = new String[array.length()];
+
+                for(int i=0; i<array.length(); i++){
+                    try{
+                        arr3[i] = array.getJSONObject(i).getString("name");
+                        arr3[i] = arr3[i] + "\n" + array.getJSONObject(i).getString("price");
+                        arr3[i] = arr3[i] + "\n" + array.getJSONObject(i).getString("calories");
+                        arr3[i] = arr3[i] + "\n" + array.getJSONObject(i).getString("time");
+                        arr3[i] = arr3[i] + "\n" + user;
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
                 }
+                adapter3 = new CustomAdapter(MenuActivity.this, arr3);
+                main.setAdapter(adapter3);
+                ListUtils.setDynamicHeight(main);
             }
-        }
-        else{
-            if(cursor2.getCount()>0) {
-                for (j = 0; j < cursor2.getCount(); j++) {
-                    arr2[j] = cursor2.getString(cursor2.getColumnIndex(DBSchema.NAME2));
-                    arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.PRICE));
-                    arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.CALORIES));
-                    arr2[j] = arr2[j] + "\n" + cursor2.getString(cursor2.getColumnIndex(DBSchema.TIME));
-                    arr2[j] = arr2[j] + "\n" + user;
-                    byte[] bytes = cursor2.getBlob(cursor2.getColumnIndex("image"));
-                    cursor2.moveToNext();
+
+            @Override
+            public void onSuccess(String result){}
+        });
+
+
+        Api api4 = new Api();
+        api4.getJSON(MenuActivity.this, "getproducts/".concat("Dessert"), new VolleyCallback() {
+            @Override
+            public void onSuccessJSON(JSONArray array) {
+                arr4 = new String[array.length()];
+
+                for(int i=0; i<array.length(); i++){
+                    try{
+                        arr4[i] = array.getJSONObject(i).getString("name");
+                        arr4[i] = arr4[i] + "\n" + array.getJSONObject(i).getString("price");
+                        arr4[i] = arr4[i] + "\n" + array.getJSONObject(i).getString("calories");
+                        arr4[i] = arr4[i] + "\n" + array.getJSONObject(i).getString("time");
+                        arr4[i] = arr4[i] + "\n" + user;
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
                 }
+                adapter4 = new CustomAdapter(MenuActivity.this, arr4);
+                dessert.setAdapter(adapter4);
+                ListUtils.setDynamicHeight(dessert);
             }
-        }
 
-        cursor3.moveToFirst();
-
-        if(!user.equals("admin")) {
-            if(cursor3.getCount()>0) {
-                for (i = 0; i < cursor3.getCount(); i++) {
-                    arr3[i] = cursor3.getString(cursor3.getColumnIndex(DBSchema.NAME2));
-                    arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.PRICE));
-                    arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.CALORIES));
-                    arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.TIME));
-                    byte[] bytes = cursor3.getBlob(cursor3.getColumnIndex("image"));
-                    cursor3.moveToNext();
-                }
-            }
-        }
-        else{
-            if(cursor3.getCount()>0) {
-                for (i = 0; i < cursor3.getCount(); i++) {
-                    arr3[i] = cursor3.getString(cursor3.getColumnIndex(DBSchema.NAME2));
-                    arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.PRICE));
-                    arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.CALORIES));
-                    arr3[i] = arr3[i] + "\n" + cursor3.getString(cursor3.getColumnIndex(DBSchema.TIME));
-                    arr3[i] = arr3[i] + "\n" + user;
-                    byte[] bytes = cursor3.getBlob(cursor3.getColumnIndex("image"));
-                    cursor3.moveToNext();
-                }
-            }
-        }
-
-        cursor4.moveToFirst();
-
-        if(!user.equals("admin")) {
-            if(cursor4.getCount()>0) {
-                for (i = 0; i < cursor4.getCount(); i++) {
-                    arr4[i] = cursor4.getString(cursor4.getColumnIndex(DBSchema.NAME2));
-                    arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.PRICE));
-                    arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.CALORIES));
-                    arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.TIME));
-                    byte[] bytes = cursor4.getBlob(cursor4.getColumnIndex("image"));
-                    cursor4.moveToNext();
-                }
-            }
-        }
-        else{
-            if(cursor4.getCount()>0) {
-                for (i = 0; i < cursor4.getCount(); i++) {
-                    arr4[i] = cursor4.getString(cursor4.getColumnIndex(DBSchema.NAME2));
-                    arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.PRICE));
-                    arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.CALORIES));
-                    arr4[i] = arr4[i] + "\n" + cursor4.getString(cursor4.getColumnIndex(DBSchema.TIME));
-                    arr4[i] = arr4[i] + "\n" + user;
-                    byte[] bytes = cursor4.getBlob(cursor4.getColumnIndex("image"));
-                    cursor4.moveToNext();
-                }
-            }
-        }
-
-
-        adapter = new CustomAdapter(this, arr);
-        drink.setAdapter(adapter);
-
-        adapter2 = new CustomAdapter(this, arr2);
-        appetizer.setAdapter(adapter2);
-
-        adapter3 = new CustomAdapter(this, arr3);
-        main.setAdapter(adapter3);
-
-        adapter4 = new CustomAdapter(this, arr4);
-        dessert.setAdapter(adapter4);
-
-        ListUtils.setDynamicHeight(drink);
-        ListUtils.setDynamicHeight(appetizer);
-        ListUtils.setDynamicHeight(main);
-        ListUtils.setDynamicHeight(dessert);
+            @Override
+            public void onSuccess(String result){}
+        });
 
 
         drink.setClickable(true);
         drink.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(!user.equals("admin")) {
-                    String value = (String) adapter.getItemAtPosition(position);
+                    String value = (String) parent.getItemAtPosition(position);
 
                     System.out.println(value);
 
@@ -256,7 +218,7 @@ public class MenuActivity extends AppCompatActivity {
                     startActivity(myIntent);
                 }
                 else{
-                    String value = (String) adapter.getItemAtPosition(position);
+                    final String value = (String) parent.getItemAtPosition(position);
                     final String[] values = value.split("\n");
 
                     AlertDialog.Builder adb=new AlertDialog.Builder(MenuActivity.this);
@@ -268,14 +230,29 @@ public class MenuActivity extends AppCompatActivity {
 
                     adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            db = dbHelper.getWritableDatabase();
-                            long status = db.delete(DBSchema.TABLE2_NAME, DBSchema.NAME2 + "=" + "'" + values[0] + "'", null);
-                            System.out.println(status);
-                            recreate();
+                           Api api = new Api();
+                           api.delete(MenuActivity.this, "deleteproduct/".concat(values[0]), new VolleyCallback() {
+                               @Override
+                               public void onSuccess(String result) {
+                                   if(result.equals("200")){
+                                       Toast.makeText(MenuActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                   }
+                                   else{
+                                       Toast.makeText(MenuActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                   }
+                                   recreate();
+                               }
+
+                               @Override
+                               public void onSuccessJSON(JSONArray arr) {
+
+                               }
+                           });
+                           recreate();
                         }});
                     adb.show();
 
-                    System.out.println(user);
+                    //System.out.println(user);
 
                 }
             }
@@ -285,11 +262,9 @@ public class MenuActivity extends AppCompatActivity {
         appetizer.setClickable(true);
         appetizer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(!user.equals("admin")) {
-                    String value = (String) adapter.getItemAtPosition(position);
+                    String value = (String) parent.getItemAtPosition(position);
 
                     System.out.println(value);
 
@@ -301,7 +276,7 @@ public class MenuActivity extends AppCompatActivity {
                     startActivity(myIntent);
                 }
                 else{
-                    String value = (String) adapter.getItemAtPosition(position);
+                    final String value = (String) parent.getItemAtPosition(position);
                     final String[] values = value.split("\n");
 
                     AlertDialog.Builder adb=new AlertDialog.Builder(MenuActivity.this);
@@ -313,14 +288,27 @@ public class MenuActivity extends AppCompatActivity {
 
                     adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            db = dbHelper.getWritableDatabase();
-                            long status = db.delete(DBSchema.TABLE2_NAME, DBSchema.NAME2 + "=" + "'" + values[0] + "'", null);
-                            System.out.println(status);
+                            Api api = new Api();
+                            api.delete(MenuActivity.this, "deleteproduct/".concat(values[0]), new VolleyCallback() {
+                                @Override
+                                public void onSuccess(String result) {
+                                    if(result.equals("200")){
+                                        Toast.makeText(MenuActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Toast.makeText(MenuActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                    recreate();
+                                }
+
+                                @Override
+                                public void onSuccessJSON(JSONArray arr) {
+
+                                }
+                            });
                             recreate();
                         }});
                     adb.show();
-
-                    System.out.println(user);
 
                 }
             }
@@ -330,11 +318,9 @@ public class MenuActivity extends AppCompatActivity {
         main.setClickable(true);
         main.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(!user.equals("admin")) {
-                    String value = (String) adapter.getItemAtPosition(position);
+                    String value = (String) parent.getItemAtPosition(position);
 
                     System.out.println(value);
 
@@ -346,7 +332,7 @@ public class MenuActivity extends AppCompatActivity {
                     startActivity(myIntent);
                 }
                 else{
-                    String value = (String) adapter.getItemAtPosition(position);
+                    final String value = (String) parent.getItemAtPosition(position);
                     final String[] values = value.split("\n");
 
                     AlertDialog.Builder adb=new AlertDialog.Builder(MenuActivity.this);
@@ -358,27 +344,39 @@ public class MenuActivity extends AppCompatActivity {
 
                     adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            db = dbHelper.getWritableDatabase();
-                            long status = db.delete(DBSchema.TABLE2_NAME, DBSchema.NAME2 + "=" + "'" + values[0] + "'", null);
-                            System.out.println(status);
+                            Api api = new Api();
+                            api.delete(MenuActivity.this, "deleteproduct/".concat(values[0]), new VolleyCallback() {
+                                @Override
+                                public void onSuccess(String result) {
+                                    if(result.equals("200")){
+                                        Toast.makeText(MenuActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Toast.makeText(MenuActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                    recreate();
+                                }
+
+                                @Override
+                                public void onSuccessJSON(JSONArray arr) {
+
+                                }
+                            });
                             recreate();
                         }});
                     adb.show();
 
-                    System.out.println(user);
-
                 }
             }
         });
+
 
         dessert.setClickable(true);
         dessert.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapter, View view, int position, long id) {
-
-
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if(!user.equals("admin")) {
-                    String value = (String) adapter.getItemAtPosition(position);
+                    String value = (String) parent.getItemAtPosition(position);
 
                     System.out.println(value);
 
@@ -390,7 +388,7 @@ public class MenuActivity extends AppCompatActivity {
                     startActivity(myIntent);
                 }
                 else{
-                    String value = (String) adapter.getItemAtPosition(position);
+                    final String value = (String) parent.getItemAtPosition(position);
                     final String[] values = value.split("\n");
 
                     AlertDialog.Builder adb=new AlertDialog.Builder(MenuActivity.this);
@@ -402,18 +400,33 @@ public class MenuActivity extends AppCompatActivity {
 
                     adb.setPositiveButton("Ok", new AlertDialog.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            db = dbHelper.getWritableDatabase();
-                            long status = db.delete(DBSchema.TABLE2_NAME, DBSchema.NAME2 + "=" + "'" + values[0] + "'", null);
-                            System.out.println(status);
+                            Api api = new Api();
+                            api.delete(MenuActivity.this, "deleteproduct/".concat(values[0]), new VolleyCallback() {
+                                @Override
+                                public void onSuccess(String result) {
+                                    if(result.equals("200")){
+                                        Toast.makeText(MenuActivity.this, "Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                    else{
+                                        Toast.makeText(MenuActivity.this, "Not Deleted", Toast.LENGTH_SHORT).show();
+                                    }
+                                    recreate();
+                                }
+
+                                @Override
+                                public void onSuccessJSON(JSONArray arr) {
+
+                                }
+                            });
                             recreate();
                         }});
                     adb.show();
 
-                    System.out.println(user);
-
                 }
             }
         });
+
+
     }
 
     public static class ListUtils {

@@ -14,6 +14,10 @@ import com.example.varun.snapsauce.datababse.DBSchema;
 import com.example.varun.snapsauce.datababse.DBHelper;
 import android.content.ContentValues;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class SignUp extends AppCompatActivity {
 
     private EditText name;
@@ -28,6 +32,8 @@ public class SignUp extends AppCompatActivity {
     private String phoneValue;
     private DBHelper dbHelper;
     private SQLiteDatabase database;
+    private String requestbody;
+    private String response;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,54 +62,63 @@ public class SignUp extends AppCompatActivity {
                     Toast.makeText(SignUp.this, R.string.fillAll, Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    dbHelper = new DBHelper(SignUp.this);
-                    database = dbHelper.getWritableDatabase();
 
+                    Api api = new Api();
+                    try {
+                        JSONObject jsonbody = new JSONObject();
 
-                    ContentValues values = new ContentValues();
-
-                    values.put(DBSchema.NAME, nameValue);
-                    values.put(DBSchema.EMAIL, emailValue);
-                    values.put(DBSchema.PASSWORD, passwordValue);
-                    values.put(DBSchema.PHONE, phoneValue);
-
-                    long status = database.insert(DBSchema.TABLE_NAME, null, values);
-                    database.close();
-
-                    if(status == -1) {
-                        Toast.makeText(SignUp.this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                        jsonbody.put("email", emailValue);
+                        jsonbody.put("password", passwordValue);
+                        jsonbody.put("name", nameValue);
+                        jsonbody.put("phone", phoneValue);
+                        requestbody = jsonbody.toString();
+                    }catch (JSONException e){
+                        e.printStackTrace();
                     }
-                    else{
-                        Toast.makeText(SignUp.this, "Signed Up", Toast.LENGTH_SHORT).show();
-                        new Thread(new Runnable() {
 
-                            public void run() {
+                    api.post(SignUp.this, requestbody, "add", new VolleyCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            if(!result.equals("200")) {
+                                Toast.makeText(SignUp.this, "Sign up failed", Toast.LENGTH_SHORT).show();
+                            }
+                            else{
+                                Toast.makeText(SignUp.this, "Signed Up", Toast.LENGTH_SHORT).show();
+                                new Thread(new Runnable() {
 
-                                try {
+                                    public void run() {
 
-                                    GMailSender sender = new GMailSender(
+                                        try {
 
-                                            "snapsauce17@gmail.com",
+                                            GMailSender sender = new GMailSender(
 
-                                            "Sonal@1717");
+                                                    "snapsauce17@gmail.com",
 
-                                    sender.sendMail("Welcome to the team", "On behalf of the snapsauce team, we welcome you!",
+                                                    "Sonal@1717");
 
-                                            "snapsauce17@gmail.com",
+                                            sender.sendMail("Welcome to the team", "On behalf of the snapsauce team, we welcome you!",
 
-                                            emailValue.toString());
+                                                    "snapsauce17@gmail.com",
 
-                                } catch (Exception e) {
+                                                    emailValue.toString());
 
-                                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_LONG).show();
+                                        } catch (Exception e) {
 
-                                }
+                                            Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_LONG).show();
+
+                                        }
+
+                                    }
+
+                                }).start();
 
                             }
+                        }
 
-                        }).start();
+                        @Override
+                        public void onSuccessJSON(JSONArray arr){}
+                    });
 
-                    }
                 }
             }
         });
